@@ -1,0 +1,67 @@
+import { NextFunction, Request, Response } from "express";
+import * as ShowService from "./show.service";
+import type { TSeatStatus } from "./show.interface";
+
+export const createShow = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const show = await ShowService.createShowService(req.body);
+    res.status(201).json(show);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getShowsByMovieDateLocation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { movieId, state, date } = req.query;
+    const shows = await ShowService.getShowsByMovieDateLocationService(
+      movieId as string,
+      date as string,
+      state as string,
+    );
+    res.status(200).json(shows);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getShowById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const show = await ShowService.getShowByIdService(req.params.id);
+    res.status(200).json(show);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSeatStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { showId } = req.params;
+    const { row, seatNumber, status } = req.query;
+    const updatedShow = await ShowService.updateSeatStatusService(
+      showId as string,
+      row as string,
+      Number(seatNumber),
+      status as TSeatStatus,
+    );
+    res.status(200).json(updatedShow);
+  } catch (error) {
+    next(error);
+  }
+};

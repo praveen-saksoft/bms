@@ -1,4 +1,4 @@
-export const formatReleaseDate = (dateString) => {
+export const formatReleaseDate = (dateString: string) => {
   const date = new Date(dateString);
   const day = date.toLocaleString("en-IN", { day: "2-digit" });
   const month = date.toLocaleString("en-IN", { month: "short" });
@@ -15,13 +15,13 @@ export const formatedTodayDate = () => {
   return formattedDate;
 };
 
-export const seatTypePrices = {
+export const seatTypePrices: any = {
   PREMIUM: 510,
   EXECUTIVE: 290,
   NORMAL: 180,
 };
 
-export const getSeatType = (seatId) => {
+export const getSeatType = (seatId: string) => {
   const row = seatId?.charAt(0);
   if (row === "E") return "PREMIUM";
   if (["B", "C", "D"].includes(row)) return "EXECUTIVE";
@@ -29,8 +29,8 @@ export const getSeatType = (seatId) => {
   return "UNKNOWN";
 };
 
-export const groupSeatsByType = (seats) => {
-  const grouped = {};
+export const groupSeatsByType = (seats: string[]) => {
+  const grouped: any = {};
 
   seats.forEach((seatId) => {
     const type = getSeatType(seatId);
@@ -41,7 +41,7 @@ export const groupSeatsByType = (seats) => {
   return Object.entries(grouped).map(([type, seats]) => ({ type, seats }));
 };
 
-export const calculateTotalPrice = (seats) => {
+export const calculateTotalPrice = (seats: string[]) => {
   const base = seats.reduce((acc, seatId) => {
     const type = getSeatType(seatId);
     const price = seatTypePrices[type] || 0;

@@ -1,10 +1,14 @@
 import app from "./app";
+import { config } from "./config/config";
+import dbConnect from "./config/db";
 
 const startServer = async () => {
-  const port = 9000;
+  const PORT = config.port;
 
-  app.listen(port, () => {
-    console.log(`Listening on port: ${port}`);
+  await dbConnect();
+
+  app.listen(PORT, () => {
+    console.log(`Listening on port: ${PORT}`);
   });
 };
 

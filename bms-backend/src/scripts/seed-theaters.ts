@@ -6,7 +6,7 @@ import { config } from "../config/config";
 dotenv.config();
 
 mongoose
-  .connect(config.databaseUrl as string)
+  .connect(config.dbUrl, { dbName: "bms" })
   .then(async () => {
     console.log("Connected to MongoDB ✅");
 
