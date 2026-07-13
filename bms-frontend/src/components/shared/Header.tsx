@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { useLiveLocation } from "@/context/LocationContext";
 
@@ -7,6 +8,8 @@ import map from "@/assets/pin.gif";
 
 const Header = () => {
   const { location, loading, error } = useLiveLocation();
+  const navigate = useNavigate();
+
   return (
     <div className="w-full text-sm bg-white">
       {/* Top Navbar */}
@@ -15,6 +18,7 @@ const Header = () => {
           {/* Left Part */}
           <div className="flex items-center flex-wrap space-x-4">
             <img
+              onClick={() => navigate("/")}
               src={mainLogo}
               alt="logo"
               className="h-8 object-contain cursor-pointer"
