@@ -33,7 +33,10 @@ const Recommended = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-semibold">Recommended Movies</h2>
-          <span className="text-md text-red-500 cursor-pointer hover:underline font-medium">
+          <span
+            className="text-md text-red-500 cursor-pointer hover:underline font-medium"
+            onClick={() => navigate("/movies")}
+          >
             See All
           </span>
         </div>

@@ -1,9 +1,13 @@
 import React from "react";
 import MovieCard from "./MovieCard";
 
-import { allMovies, languages } from "@/utils/constants";
+import { languages } from "@/utils/constants";
 
-const MovieList = () => {
+interface IMovieListProps {
+  allMovies: any[];
+}
+
+const MovieList: React.FC<IMovieListProps> = ({ allMovies }) => {
   return (
     <div className="w-full md:w-3/4 p-4">
       <div className="flex flex-wrap gap-2 mb-4">
@@ -26,7 +30,7 @@ const MovieList = () => {
 
       <div className="flex flex-wrap gap-6">
         {allMovies.map((movie, i) => (
-          <MovieCard key={movie.id} movie={movie} />
+          <MovieCard key={movie._id} movie={movie} />
         ))}
       </div>
     </div>
