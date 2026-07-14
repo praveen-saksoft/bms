@@ -4,6 +4,8 @@ export type TShowFormat = "2D" | "3D" | "IMAX" | "PVR PXL";
 
 export type TSeatStatus = "AVAILABLE" | "BOOKED" | "BLOCKED";
 
+export type TSeatType = "PREMIUM" | "EXECUTIVE" | "NORMAL";
+
 export interface ISeat {
   number: number;
   status: TSeatStatus;
@@ -11,6 +13,8 @@ export interface ISeat {
 
 export interface ISeatRow {
   row: string;
+  type: TSeatType;
+  price: number;
   seats: ISeat[];
 }
 

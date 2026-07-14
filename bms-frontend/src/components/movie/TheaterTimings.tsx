@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
@@ -10,6 +11,7 @@ interface ITheaterTimingsProps {
 }
 
 const TheaterTimings: React.FC<ITheaterTimingsProps> = ({ movieId }) => {
+  const navigate = useNavigate();
   const { location } = useLiveLocation();
 
   const today = dayjs();
@@ -30,7 +32,18 @@ const TheaterTimings: React.FC<ITheaterTimingsProps> = ({ movieId }) => {
     select: (res) => res.data,
   });
 
-  console.log(showData);
+  const sanitizeTitle = (origTitle: string) => {
+    const sanitizedTitle = origTitle.replace(/(:|-)/g, "");
+    return sanitizedTitle.replace(/\s+/g, "-").toLowerCase();
+  };
+
+  const handleNavigate = (movie: any, theater: any, show: any) => {
+    const movieName = sanitizeTitle(movie?.title);
+
+    navigate(
+      `/movies/${movie?._id}/${movieName}/${location}/theater/${theater?._id}/show/${show?._id}/seat-layout`,
+    );
+  };
 
   return (
     <>
@@ -83,6 +96,7 @@ const TheaterTimings: React.FC<ITheaterTimingsProps> = ({ movieId }) => {
                 <button
                   key={slot._id}
                   className="border cursor-pointer hover:bg-gray-100 border-gray-300 rounded-[16px] px-12 py-2 text-sm flex flex-col items-center justify-center"
+                  onClick={() => handleNavigate(show.movie, show.theater, slot)}
                 >
                   <span className="leading-tight font-semibold">
                     {slot.startTime}

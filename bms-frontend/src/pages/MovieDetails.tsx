@@ -8,22 +8,6 @@ import { getMovieById } from "@/apis";
 
 import TheaterTimings from "@/components/movie/TheaterTimings";
 
-// import m4 from "../assets/m4.avif";
-// const movie = {
-//   id: 4,
-//   title: "F1: The Movie",
-//   genre: ["Action", "Drama", "Sports"],
-//   rating: 9.5,
-//   votes: "6.8K",
-//   img: m4,
-//   languages: ["English", "Hindi", "Tamil", "Telugu"],
-//   format: ["2D", "3D", "IMAX 3D"],
-//   certification: "UA16+",
-//   duration: "2h 24m",
-//   releaseDate: "2023-09-15",
-//   description: `F1: The Movie is a thrilling documentary that takes you behind the scenes of the high-octane world of Formula 1 racing. Directed by the acclaimed filmmaker, this movie offers an in-depth look at the 2023 Formula 1 season, showcasing the intense competition, cutting-edge technology, and the personal stories of the drivers and teams. With breathtaking footage from some of the most iconic circuits around the globe, F1: The Movie captures the speed, precision, and drama that define this exhilarating sport. Whether you're a die-hard F1 fan or new to the world of motorsport, this film promises an unforgettable cinematic experience that celebrates the passion and dedication of everyone involved in Formula 1.`,
-// };
-
 const MovieDetails: React.FC = () => {
   const { id: movieId } = useParams();
   const { data: movie, isError } = useQuery({

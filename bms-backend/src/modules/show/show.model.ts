@@ -1,5 +1,21 @@
 import mongoose, { Schema } from "mongoose";
-import type { IShow } from "./show.interface";
+import type { ISeat, ISeatRow, IShow } from "./show.interface";
+
+const SeatItemSchema: Schema<ISeat> = new Schema({
+  number: { type: Number, required: true },
+  status: {
+    type: String,
+    enum: ["AVAILABLE", "BOOKED", "BLOCKED"],
+    default: "AVAILABLE",
+  },
+});
+
+const RowSchema: Schema<ISeatRow> = new Schema({
+  row: String,
+  type: String,
+  price: { type: Number, required: true },
+  seats: [SeatItemSchema],
+});
 
 const ShowSchema: Schema<IShow> = new Schema(
   {
@@ -15,21 +31,7 @@ const ShowSchema: Schema<IShow> = new Schema(
     startTime: { type: String, required: true },
     date: { type: String, required: true },
     priceMap: { type: Map, of: Number, required: true, default: new Map() },
-    seatLayout: [
-      {
-        row: String,
-        seats: [
-          {
-            number: Number,
-            status: {
-              type: String,
-              enum: ["AVAILABLE", "BOOKED", "BLOCKED"],
-              default: "AVAILABLE",
-            },
-          },
-        ],
-      },
-    ],
+    seatLayout: [RowSchema],
   },
   {
     timestamps: true,

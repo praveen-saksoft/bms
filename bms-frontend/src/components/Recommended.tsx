@@ -13,7 +13,7 @@ const Recommended = () => {
     const sanitizedTitle = originalTitle.replace(/(:|-)/g, "");
     const formattedTitle = sanitizedTitle.replace(/\s+/g, "-").toLowerCase();
 
-    navigate(`/movies/${location}/${formattedTitle}/${movie._id}/ticket`);
+    navigate(`/movies/${movie._id}/${formattedTitle}/${location}/shows`);
   };
   // API CALL
   const { data: recMovies, isError } = useQuery({

@@ -44,13 +44,22 @@ export const getShowsByMovieDateLocationService = async (
       $unwind: "$theaterDetails",
     },
     {
+      $lookup: {
+        from: "movies",
+        localField: "movie",
+        foreignField: "_id",
+        as: "movieDetails",
+      },
+    },
+    { $unwind: "$movieDetails" },
+    {
       $sort: { startTime: 1 },
     },
     {
       $group: {
         _id: "$theaterDetails._id",
         theater: { $first: "$theaterDetails" },
-        movie: { $first: "$movie" },
+        movie: { $first: "$movieDetails" },
         shows: {
           $push: {
             _id: "$_id",
