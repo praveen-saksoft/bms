@@ -1,11 +1,12 @@
 import React from "react";
+import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+
 import { filters } from "@/utils/constants";
 import { getMovieById } from "@/apis";
 
 import TheaterTimings from "@/components/movie/TheaterTimings";
-import { useParams } from "react-router-dom";
-import dayjs from "dayjs";
 
 // import m4 from "../assets/m4.avif";
 // const movie = {
@@ -25,7 +26,6 @@ import dayjs from "dayjs";
 
 const MovieDetails: React.FC = () => {
   const { id: movieId } = useParams();
-
   const { data: movie, isError } = useQuery({
     queryKey: ["movie", movieId],
     queryFn: async () => await getMovieById(movieId!),
@@ -145,7 +145,7 @@ const MovieDetails: React.FC = () => {
         </div>
 
         {/* Theatres and Timings */}
-        <TheaterTimings />
+        <TheaterTimings movieId={movieId!} />
       </div>
     </>
   );

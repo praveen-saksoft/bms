@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { generateSeatLayout, groupShowsByTheatreAndMovie } from "../../utils";
+import { generateSeatLayout } from "../../utils";
 import type { IShow, TSeatStatus } from "./show.interface";
 import { ShowModel } from "./show.model";
 
@@ -28,13 +28,51 @@ export const getShowsByMovieDateLocationService = async (
     query.date = date;
   }
 
-  const shows = await ShowModel.find(query)
-    .populate("movie theater")
-    .sort({ startTime: 1 });
+  const shows = await ShowModel.aggregate([
+    {
+      $match: query,
+    },
+    {
+      $lookup: {
+        from: "theaters",
+        localField: "theater",
+        foreignField: "_id",
+        as: "theaterDetails",
+      },
+    },
+    {
+      $unwind: "$theaterDetails",
+    },
+    {
+      $sort: { startTime: 1 },
+    },
+    {
+      $group: {
+        _id: "$theaterDetails._id",
+        theater: { $first: "$theaterDetails" },
+        movie: { $first: "$movie" },
+        shows: {
+          $push: {
+            _id: "$_id",
+            date: "$date",
+            startTime: "$startTime",
+            format: "$format",
+            audioType: "$audioType",
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        movie: 1,
+        theater: 1,
+        shows: 1,
+      },
+    },
+  ]);
 
-  const groupedShows = groupShowsByTheatreAndMovie(shows);
-
-  return groupedShows;
+  return shows;
 };
 
 // get show by id

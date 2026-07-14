@@ -1,13 +1,36 @@
 import React, { useState } from "react";
 import dayjs from "dayjs";
-import { theatres } from "@/utils/constants";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
-const TheaterTimings = () => {
+import { useLiveLocation } from "@/context/LocationContext";
+import { getShowsByMovieAndLocation } from "@/apis";
+
+interface ITheaterTimingsProps {
+  movieId: string;
+}
+
+const TheaterTimings: React.FC<ITheaterTimingsProps> = ({ movieId }) => {
+  const { location } = useLiveLocation();
+
   const today = dayjs();
   const [selectedDate, setSelectedDate] = useState(today);
-  const formattedDate = selectedDate.format("DD-MM-YY");
+  const formattedDate = selectedDate.format("DD-MM-YYYY");
 
   const next7days = Array.from({ length: 7 }, (_, i) => today.add(i, "day"));
+
+  const {
+    data: showData,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["show", movieId, location, formattedDate],
+    queryFn: async () =>
+      await getShowsByMovieAndLocation(movieId, location!, formattedDate),
+    placeholderData: keepPreviousData,
+    select: (res) => res.data,
+  });
+
+  console.log(showData);
 
   return (
     <>
@@ -36,32 +59,39 @@ const TheaterTimings = () => {
       </div>
       {/* Theater */}
       <div className="space-y-8 px-4 mb-10">
-        {theatres?.map((theater, i) => (
-          <div key={i}>
+        {showData?.length === 0 && (
+          <div className="text-center text-gray-500">
+            No Shows available for the selected date
+          </div>
+        )}
+        {showData?.map((show: any) => (
+          <div key={show.theater?._id}>
             <div className="flex items-start gap-3 mb-2">
               <img
-                src={theater.img}
+                src={show.theater?.logo}
                 alt="logo"
                 className="w-8 h-8 object-contain"
               />
               <div>
-                <p className="font-semibold">{theater.name}</p>
+                <p className="font-semibold">{show.theater?.name}</p>
                 <p className="text-sm text-gray-500">Allows Cancellation</p>
               </div>
             </div>
             {/* Timings */}
             <div className="flex flex-wrap gap-3 ml-11">
-              {theater.timings.map((slot, i) => (
+              {show.shows?.map((slot: any) => (
                 <button
-                  key={i}
+                  key={slot._id}
                   className="border cursor-pointer hover:bg-gray-100 border-gray-300 rounded-[16px] px-12 py-2 text-sm flex flex-col items-center justify-center"
                 >
                   <span className="leading-tight font-semibold">
-                    {slot.time}
+                    {slot.startTime}
                   </span>
-                  <span className="text-[10px] text-gray-500 font-black">
-                    {slot.label}
-                  </span>
+                  {slot.audioType && (
+                    <span className="text-[10px] text-gray-500 font-black">
+                      {slot.audioType}
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
