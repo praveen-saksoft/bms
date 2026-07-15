@@ -29,7 +29,7 @@ export const getSeatType = (seatId: string) => {
   return "UNKNOWN";
 };
 
-export const groupSeatsByType = (seats: string[]) => {
+export const groupSeatsByType = (seats: any[]) => {
   const grouped: any = {};
 
   seats.forEach((seatId) => {
@@ -41,7 +41,7 @@ export const groupSeatsByType = (seats: string[]) => {
   return Object.entries(grouped).map(([type, seats]) => ({ type, seats }));
 };
 
-export const calculateTotalPrice = (seats: string[]) => {
+export const calculateTotalPrice = (seats: any[]) => {
   const base = seats.reduce((acc, seatId) => {
     const type = getSeatType(seatId);
     const price = seatTypePrices[type] || 0;

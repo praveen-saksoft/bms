@@ -6,16 +6,18 @@ import Movies from "./pages/Movies";
 import MovieDetails from "./pages/MovieDetails";
 import Profile from "./pages/Profile";
 import SeatLayout from "./pages/SeatLayout";
+import Checkout from "./pages/Checkout";
 
 function App() {
   const isSeatLayoutPage = useMatch(
     "/movies/:id/:movieName/:state/theater/:theaterId/show/:showId/seat-layout",
   );
+  const isCheckoutPage = useMatch("/shows/:showId/:state/checkout");
   return (
     <>
       <div className="flex flex-col min-h-screen">
         <main className="grow">
-          {!isSeatLayoutPage && <Header />}
+          {!(isSeatLayoutPage || isCheckoutPage) && <Header />}
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
@@ -28,9 +30,13 @@ function App() {
               path="/movies/:id/:movieName/:state/theater/:theaterId/show/:showId/seat-layout"
               element={<SeatLayout />}
             />
+            <Route
+              path="/shows/:showId/:state/checkout"
+              element={<Checkout />}
+            />
           </Routes>
         </main>
-        {!isSeatLayoutPage && <Footer />}
+        {!(isSeatLayoutPage || isCheckoutPage) && <Footer />}
       </div>
     </>
   );
