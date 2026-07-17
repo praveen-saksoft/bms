@@ -41,18 +41,3 @@ This system includes advanced features like **concurrent seat locking**, **real-
 - **Deployment:** Render / Vercel *(Optional)*
 
 ---
-
-## 🙌 Stay Connected
-
-- 🔔 **Subscribe on YouTube:** Programming with Amrit
-- 💼 **LinkedIn:** [rajamrit15](https://www.linkedin.com/in/rajamrit15/)
-- 🧑‍💻 **GitHub:** [amritmaurya1504](https://github.com/amritmaurya1504)
-
----
-
-## 🏷️ Tags
-
-`#mernproject` `#moviebooking` `#bookmyshowclone` `#reactjs` `#nodejs`  
-`#mongodb` `#webdevelopment` `#seatbooking` `#techprojects` `#fullstackproject`
-
----
