@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import type { IUser } from "./user.interface";
 import { UserModel } from "./user.model";
 

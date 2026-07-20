@@ -73,7 +73,7 @@ export const verifyOtp = async (
     //1. OTP Verification
     const [hashedOtpData, expires] = hash.split(".");
     if (Date.now() > +expires) {
-      const err = new createHttpError.Gone("OTP Expired");
+      const err = new createHttpError.Unauthorized("OTP Expired");
       next(err);
       return;
     }
@@ -104,7 +104,7 @@ export const verifyOtp = async (
 
     //3. Generate JWT
     const { accessToken, refreshToken } = TokenService.generateToken({
-      id: user._id as string,
+      _id: user._id as string,
       email: user.email,
     });
 

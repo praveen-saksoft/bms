@@ -33,14 +33,7 @@ export const getUserById = async (
   next: NextFunction,
 ) => {
   try {
-    const user = await UserService.getUserByIdService(req.params.id);
-
-    if (!user) {
-      next(new Error("User not found", { cause: { statusCode: 404 } }));
-      return;
-    }
-
-    res.status(200).json(user);
+    res.status(200).json(req.user);
   } catch (error) {
     next(error);
   }
@@ -52,9 +45,9 @@ export const activateUser = async (
   next: NextFunction,
 ) => {
   try {
-    const updateData = req.body;
-    updateData.activateUser = true;
-    const updatedUser = await UserService.activateUserService(req.params.id, updateData);
+    const updatedUser = await UserService.activateUserService(req.params.id, {
+      activateUser: true,
+    });
     res.status(200).json(updatedUser);
   } catch (error) {
     next(error);

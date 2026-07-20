@@ -11,7 +11,7 @@ export interface IRefreshTokenPayload {
 }
 
 export interface ITokenPayload {
-  id: string;
+  _id: string;
   email?: string;
   phone?: string;
   role?: string;

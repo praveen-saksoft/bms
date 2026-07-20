@@ -7,7 +7,7 @@ export const globalErrorHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  let statusCode = err?.cause?.statusCode || 500;
+  let statusCode = err?.cause?.statusCode || err?.statusCode || 500;
   let message = "Internal Server Error";
   let errors: { field?: string; message?: string }[] = [];
 
@@ -20,7 +20,8 @@ export const globalErrorHandler = (
       message: e.message,
     }));
   } else if (err instanceof Error) {
-    message = err.message;
+    message = err.name;
+    errors = err?.message?.split(",").map((message) => ({ message }));
 
     if (err.name === "CastError") {
       statusCode = 400;
