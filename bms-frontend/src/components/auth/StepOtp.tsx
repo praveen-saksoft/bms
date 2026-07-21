@@ -1,7 +1,9 @@
 import React, { useRef, useState } from "react";
-
-import { useCountDown } from "@/hooks/useCountDown";
 import { IoClose } from "react-icons/io5";
+import { BeatLoader } from "react-spinners";
+
+import { useAuth } from "@/context/AuthContext";
+import { useCountDown } from "@/hooks/useCountDown";
 
 interface IStepOtpProps {
   onNext: React.MouseEventHandler<HTMLButtonElement>;
@@ -9,8 +11,9 @@ interface IStepOtpProps {
 
 const StepOtp: React.FC<IStepOtpProps> = ({ onNext }) => {
   const [otpArray, setOtpArray] = useState(new Array(4).fill(""));
-  const inputRef = useRef(null);
+  const inputRef = useRef<Array<HTMLInputElement | null>>([]);
 
+  const { verifyOtpRequest, verifyOtpLoading, sendOtpRequest } = useAuth();
   const { displayTime, isExpired } = useCountDown({
     initialTimeInSeconds: 2 * 60,
   });
@@ -20,10 +23,31 @@ const StepOtp: React.FC<IStepOtpProps> = ({ onNext }) => {
     i: number,
   ) => {
     e.preventDefault();
+    const { value } = e?.target;
+    if (!isNaN(parseInt(value))) {
+      setOtpArray([...otpArray.map((d, idx) => (i === idx ? value : d))]);
+      if (value !== "" && i < inputRef.current.length - 1) {
+        inputRef.current[i + 1]?.focus();
+      }
+    }
+  };
+
+  const handleClearOtp = (e: React.MouseEvent<HTMLSpanElement>) => {
+    e.preventDefault();
+    setOtpArray(new Array(4).fill(""));
+    inputRef.current[0]?.focus();
   };
 
   const handleResendOtp = (e: React.MouseEvent<HTMLSpanElement>) => {
     e.preventDefault();
+    handleClearOtp(e);
+    sendOtpRequest({ resend: true });
+  };
+
+  const handleVerifyOtp = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const otp = parseInt(otpArray.join(""), 10);
+    verifyOtpRequest({ otp, onNext });
   };
 
   return (
@@ -45,11 +69,17 @@ const StepOtp: React.FC<IStepOtpProps> = ({ onNext }) => {
             maxLength={1}
             value={digit}
             onChange={(e) => handleOtpChange(e, i)}
+            ref={(el) => {
+              inputRef.current[i] = el;
+            }}
             className="w-12 h-12 font-bold text-center rounded-md mx-1 border border-gray-200 text-white-500 outline-none"
           />
         ))}
 
-        <button className="w-8 h-8 cursor-pointer border border-gray-200 items-center text-[#f74565] ml-1 font-bold outline-none rounded-md">
+        <button
+          onClick={handleClearOtp}
+          className="w-8 h-8 cursor-pointer border border-gray-200 items-center text-[#f74565] ml-1 font-bold outline-none rounded-md"
+        >
           <IoClose size={24} className="inline" />
         </button>
       </div>
@@ -72,10 +102,10 @@ const StepOtp: React.FC<IStepOtpProps> = ({ onNext }) => {
 
       <button
         type="submit"
-        onClick={onNext}
+        onClick={handleVerifyOtp}
         className="w-full cursor-pointer text-white bg-black py-2 rounded-md text-lg hover:bg-gray-800 transition"
       >
-        Continue
+        {verifyOtpLoading ? <BeatLoader size={12} color="white" /> : "Continue"}
       </button>
 
       <p className="text-[#c4c5c5] text-center m-auto text-[12px]">

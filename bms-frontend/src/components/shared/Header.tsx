@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaUser } from "react-icons/fa";
 import { useLiveLocation } from "@/context/LocationContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -9,7 +9,7 @@ import map from "@/assets/pin.gif";
 
 const Header = () => {
   const { location, loading, error } = useLiveLocation();
-  const { toggleModal } = useAuth();
+  const { toggleModal, isLoggedIn, user } = useAuth();
 
   const navigate = useNavigate();
 
@@ -44,12 +44,26 @@ const Header = () => {
               )}
               {location && <p className="mt-2">{location} &nbsp; ▼</p>}
             </div>
-            <button
-              onClick={toggleModal}
-              className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm font-medium"
-            >
-              Sign in
-            </button>
+            {isLoggedIn ? (
+              <div
+                className="cursor-pointer flex items-center gap-2"
+                onClick={() => navigate(`/profile/${user?._id}`)}
+              >
+                <span className="cursor-pointer text-sm font-medium border rounded-full border-gray-300 p-2">
+                  <FaUser className="text-gray-500" />
+                </span>
+                <span className="text-sm font-normal cursor-pointer hover:text-red-500">
+                  {user ? user.name?.split(" ")[0] : "Test User"} &nbsp; ▼
+                </span>
+              </div>
+            ) : (
+              <button
+                onClick={toggleModal}
+                className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm font-medium"
+              >
+                Sign in
+              </button>
+            )}
           </div>
         </div>
       </div>

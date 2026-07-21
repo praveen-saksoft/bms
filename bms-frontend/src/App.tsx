@@ -8,20 +8,33 @@ import Profile from "./pages/Profile";
 import SeatLayout from "./pages/SeatLayout";
 import Checkout from "./pages/Checkout";
 import SignInModal from "./components/shared/SignInModal";
+import FullScreenLoader from "./components/shared/FullScreenLoader";
+import { Toaster } from "react-hot-toast";
+import { useLoadUser } from "./hooks/useLoadUser";
 
 function App() {
+  const { isLoading } = useLoadUser();
+
   const isSeatLayoutPage = useMatch(
     "/movies/:id/:movieName/:state/theater/:theaterId/show/:showId/seat-layout",
   );
   const isCheckoutPage = useMatch("/shows/:showId/:state/checkout");
+
+  if (isLoading) {
+    return <FullScreenLoader />;
+  }
   return (
     <>
+      <Toaster
+        position="top-right"
+        toastOptions={{ style: { fontSize: 14 } }}
+      />
       <div className="flex flex-col min-h-screen">
         <main className="grow">
           {!(isSeatLayoutPage || isCheckoutPage) && <Header />}
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:id" element={<Profile />} />
             <Route path="/movies" element={<Movies />} />
             <Route
               path="/movies/:id/:movieName/:state/shows"

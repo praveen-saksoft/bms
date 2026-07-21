@@ -7,6 +7,7 @@ dayjs.extend(customParseFormat);
 import mainLogo from "@/assets/main-icon.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { FaUser } from "react-icons/fa";
 
 interface ISeatHeaderProps {
   showData?: any;
@@ -16,7 +17,7 @@ interface ISeatHeaderProps {
 const SeatHeader: React.FC<ISeatHeaderProps> = ({ showData, type }) => {
   const navigate = useNavigate();
 
-  const { toggleModal } = useAuth();
+  const { toggleModal, isLoggedIn, user } = useAuth();
 
   return (
     <>
@@ -56,12 +57,26 @@ const SeatHeader: React.FC<ISeatHeaderProps> = ({ showData, type }) => {
             </div>
           )}
 
-          <button
-            onClick={toggleModal}
-            className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm"
-          >
-            Sign in
-          </button>
+          {isLoggedIn ? (
+            <div
+              className="cursor-pointer flex items-center gap-2"
+              onClick={() => navigate(`/profile/${user?._id}`)}
+            >
+              <span className="cursor-pointer text-sm font-medium border rounded-full border-gray-300 p-2">
+                <FaUser className="text-gray-500" />
+              </span>
+              <span className="text-sm font-normal cursor-pointer hover:text-red-500">
+                {user ? user.name?.split(" ")[0] : "Test User"} &nbsp; ▼
+              </span>
+            </div>
+          ) : (
+            <button
+              onClick={toggleModal}
+              className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm font-medium"
+            >
+              Sign in
+            </button>
+          )}
         </div>
       </div>
       {/* Show Timings */}

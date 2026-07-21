@@ -29,7 +29,7 @@ const MovieList: React.FC<IMovieListProps> = ({ allMovies }) => {
       </div>
 
       <div className="flex flex-wrap gap-6">
-        {allMovies.map((movie, i) => (
+        {allMovies?.map((movie, i) => (
           <MovieCard key={movie._id} movie={movie} />
         ))}
       </div>

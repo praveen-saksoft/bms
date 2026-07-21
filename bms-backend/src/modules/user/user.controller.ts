@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import * as UserService from "./user.service";
+import { IUser } from "./user.interface";
 
 export const createUser = async (
   req: Request,
@@ -45,7 +46,11 @@ export const activateUser = async (
   next: NextFunction,
 ) => {
   try {
+    const { name, mobile } = req.body as IUser;
+
     const updatedUser = await UserService.activateUserService(req.params.id, {
+      name,
+      mobile,
       activateUser: true,
     });
     res.status(200).json(updatedUser);

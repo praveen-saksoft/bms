@@ -3,10 +3,18 @@ import { IoIosLogOut, IoMdAdd } from "react-icons/io";
 import { FiEdit } from "react-icons/fi";
 
 import { tabs } from "@/utils/constants";
+import { useAuth } from "@/context/AuthContext";
 import BookingHistory from "@/components/profile/BookingHistory";
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("Profile");
+
+  const { user, logoutRequest, logoutLoading } = useAuth();
+
+  const handleLogout = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    logoutRequest();
+  };
 
   return (
     <>
@@ -29,13 +37,16 @@ const Profile = () => {
           {activeTab === "Profile" && (
             <>
               {/* Headers */}
-              <div className="bg-gradient-to-r from-gray-800 to-[#f74565] rounded-t-md px-6 py-6 flex items-center gap-6 text-white">
+              <div className="bg-linear-to-r from-gray-800 to-[#f74565] rounded-t-md px-6 py-6 flex items-center gap-6 text-white">
                 <div className="relative w-20 h-20 border-4 border-white rounded-full flex items-center justify-center bg-white text-gray-600">
                   <IoMdAdd size={24} />
                 </div>
                 <div className="mt-2">
-                  <h2 className="text-2xl font-bold">Hi, Praveen Kumar</h2>
-                  <small className="underline cursor-pointer">
+                  <h2 className="text-2xl font-bold">Hi, {user?.name}</h2>
+                  <small
+                    onClick={handleLogout}
+                    className="underline cursor-pointer"
+                  >
                     <IoIosLogOut size={20} className="inline" /> Logout
                   </small>
                 </div>
@@ -46,7 +57,7 @@ const Profile = () => {
                 <div className="mb-3 flex items-center justify-between">
                   <p className="text-sm font-normal">Email Address</p>
                   <div className="flex items-center gap-2">
-                    <span>test@gmail.com</span>
+                    <span>{user?.email}</span>
                     <span className="text-green-600 text-xs bg-green-100 px-2 rounded">
                       Verified
                     </span>
@@ -56,7 +67,7 @@ const Profile = () => {
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-normal">Mobile Number</p>
                   <div className="flex items-center gap-2">
-                    <span>919292929292</span>
+                    <span>{user?.mobile}</span>
                     <span className="text-green-600 text-xs bg-green-100 px-2 rounded">
                       Verified
                     </span>
@@ -72,7 +83,7 @@ const Profile = () => {
                     <label className="text-sm font-normal">Name</label>
                     <input
                       type="text"
-                      value="Praveen Kumar"
+                      value={user?.name}
                       readOnly
                       className="w-full mt-1 border border-gray-200 rounded-lg px-3 py-2"
                     />

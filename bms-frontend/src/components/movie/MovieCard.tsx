@@ -21,7 +21,7 @@ const MovieCard: React.FC<IMovieProps> = ({ movie }) => {
 
   return (
     <div
-      className="w-40 md:w-52 cursor-pointer"
+      className="w-40 md:w-56 cursor-pointer"
       onClick={() => handleNavigate(movie)}
     >
       <img

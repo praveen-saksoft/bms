@@ -19,16 +19,16 @@ const SignInModal = () => {
 
   const StepComponent = steps[step];
 
-  const onNext = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const onNext = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    e?.preventDefault();
     setStep(step + 1);
   };
 
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 z-50  flex items-center justify-center bg-opacity-50 backdrop-blur-xs">
-      <div className="w-[90%] h-[620px] max-w-xl bg-white rounded-3xl shadow-lg animate-fadeIn overflow-hidden">
+    <div className="fixed inset-0 z-50  flex items-center justify-center bg-opacity-50 backdrop-contrast-75 backdrop-blur-xs">
+      <div className="w-[90%] max-h-[90vh] max-w-xl bg-white rounded-3xl shadow-lg animate-fadeIn overflow-x-hidden overflow-y-auto">
         {/* Top header section */}
         <div className="bg-linear-to-r from-gray-800 to-[#f74565] text-white px-6 py-8 h-[300px] relative flex items-center justify-center flex-col">
           <IoClose

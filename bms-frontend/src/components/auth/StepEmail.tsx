@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { BeatLoader } from "react-spinners";
+import { useAuth } from "@/context/AuthContext";
 
 interface IStepEmailProps {
   onNext: React.MouseEventHandler<HTMLButtonElement>;
@@ -6,6 +8,14 @@ interface IStepEmailProps {
 
 const StepEmail: React.FC<IStepEmailProps> = ({ onNext }) => {
   const [email, setEmail] = useState("");
+
+  const { sendOtpRequest, sendOtpLoading } = useAuth();
+
+  const handleSendOtp = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!email) return;
+    sendOtpRequest({ email, onNext });
+  };
 
   return (
     <div className="flex flex-col gap-3 px-10 py-6">
@@ -26,10 +36,10 @@ const StepEmail: React.FC<IStepEmailProps> = ({ onNext }) => {
 
       <button
         type="submit"
-        onClick={onNext}
+        onClick={handleSendOtp}
         className="w-full cursor-pointer text-white bg-black py-2 rounded-md text-lg hover:bg-gray-800 transition"
       >
-        Continue
+        {sendOtpLoading ? <BeatLoader size={12} color="white" /> : "Continue"}
       </button>
 
       <p className="text-[#c4c5c5] text-center m-auto text-[12px]">

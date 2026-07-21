@@ -1,14 +1,18 @@
 import React, { useState } from "react";
+import { BeatLoader } from "react-spinners";
 
-interface IStepAccountCreationProps {
-  onNext: React.MouseEventHandler<HTMLButtonElement>;
-}
+import { useAuth } from "@/context/AuthContext";
 
-const StepAccountCreation: React.FC<IStepAccountCreationProps> = ({
-  onNext,
-}) => {
+const StepAccountCreation = () => {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
+
+  const { activateUserRequest, activateUserLoading } = useAuth();
+
+  const handleActivateUser = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    activateUserRequest({ name, mobile });
+  };
 
   return (
     <div className="flex flex-col gap-3 px-10 py-6">
@@ -41,10 +45,14 @@ const StepAccountCreation: React.FC<IStepAccountCreationProps> = ({
 
       <button
         type="submit"
-        onClick={onNext}
+        onClick={handleActivateUser}
         className="w-full cursor-pointer text-white bg-black py-2 rounded-md text-lg hover:bg-gray-800 transition"
       >
-        Create Account
+        {activateUserLoading ? (
+          <BeatLoader size={12} color="white" />
+        ) : (
+          "Create Account"
+        )}
       </button>
 
       <p className="text-[#c4c5c5] text-center m-auto text-[12px]">

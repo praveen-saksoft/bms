@@ -1,5 +1,5 @@
-import { languages } from "@/utils/constants";
 import React from "react";
+import { languages } from "@/utils/constants";
 
 const MovieFilters = () => {
   return (
@@ -15,7 +15,10 @@ const MovieFilters = () => {
         </div>
         <div className="flex flex-wrap gap-2">
           {languages.map((lang, i) => (
-            <span className="border border-gray-200 text-[#f74362] px-3 py-1 text-sm rounded hover:bg-gray-100 cursor-pointer">
+            <span
+              key={i}
+              className="border border-gray-200 text-[#f74362] px-3 py-1 text-sm rounded hover:bg-gray-100 cursor-pointer"
+            >
               {lang}
             </span>
           ))}
@@ -25,7 +28,9 @@ const MovieFilters = () => {
       <div className="bg-white p-4 rounded-md -mt-3">
         <div className="flex justify-between items-center mb-2">
           <span className="font-medium">Genres</span>
-          <button className="text-[#f74362] text-sm cursor-pointer">clear</button>
+          <button className="text-[#f74362] text-sm cursor-pointer">
+            clear
+          </button>
         </div>
         {/* <div className="flex flex-wrap gap-2">
           {languages.map((lang, i) => (
@@ -39,7 +44,9 @@ const MovieFilters = () => {
       <div className="bg-white p-4 rounded-md -mt-3">
         <div className="flex justify-between items-center mb-2">
           <span className="font-medium">Format</span>
-          <button className="text-[#f74362] text-sm cursor-pointer">clear</button>
+          <button className="text-[#f74362] text-sm cursor-pointer">
+            clear
+          </button>
         </div>
         {/* <div className="flex flex-wrap gap-2">
           {languages.map((lang, i) => (
