@@ -2,12 +2,15 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { useLiveLocation } from "@/context/LocationContext";
+import { useAuth } from "@/context/AuthContext";
 
 import mainLogo from "@/assets/main-icon.png";
 import map from "@/assets/pin.gif";
 
 const Header = () => {
   const { location, loading, error } = useLiveLocation();
+  const { toggleModal } = useAuth();
+
   const navigate = useNavigate();
 
   return (
@@ -41,7 +44,10 @@ const Header = () => {
               )}
               {location && <p className="mt-2">{location} &nbsp; ▼</p>}
             </div>
-            <button className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm font-medium">
+            <button
+              onClick={toggleModal}
+              className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm font-medium"
+            >
               Sign in
             </button>
           </div>

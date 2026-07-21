@@ -6,6 +6,7 @@ dayjs.extend(customParseFormat);
 
 import mainLogo from "@/assets/main-icon.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 interface ISeatHeaderProps {
   showData?: any;
@@ -14,6 +15,8 @@ interface ISeatHeaderProps {
 
 const SeatHeader: React.FC<ISeatHeaderProps> = ({ showData, type }) => {
   const navigate = useNavigate();
+
+  const { toggleModal } = useAuth();
 
   return (
     <>
@@ -53,7 +56,10 @@ const SeatHeader: React.FC<ISeatHeaderProps> = ({ showData, type }) => {
             </div>
           )}
 
-          <button className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm">
+          <button
+            onClick={toggleModal}
+            className="bg-[#f84464] cursor-pointer text-white px-4 py-1.5 rounded text-sm"
+          >
             Sign in
           </button>
         </div>

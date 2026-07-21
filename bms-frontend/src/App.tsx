@@ -7,6 +7,7 @@ import MovieDetails from "./pages/MovieDetails";
 import Profile from "./pages/Profile";
 import SeatLayout from "./pages/SeatLayout";
 import Checkout from "./pages/Checkout";
+import SignInModal from "./components/shared/SignInModal";
 
 function App() {
   const isSeatLayoutPage = useMatch(
@@ -37,6 +38,7 @@ function App() {
           </Routes>
         </main>
         {!(isSeatLayoutPage || isCheckoutPage) && <Footer />}
+        <SignInModal />
       </div>
     </>
   );
