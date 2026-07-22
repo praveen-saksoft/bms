@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { getShowById } from "@/apis";
 import screenImg from "@/assets/screen.png";
+import { useSeat } from "@/context/SeatContext";
 
 import SeatHeader from "@/components/seat-layout/SeatHeader";
 import SeatFooter from "@/components/seat-layout/SeatFooter";
@@ -19,38 +20,46 @@ interface ISeatProps {
 const Seat: React.FC<ISeatProps> = ({
   seat,
   row,
-  // selectedSeats,
-  // lockedSeats,
-  // onClick,
+  selectedSeats,
+  lockedSeats,
+  onClick,
 }) => {
   const seatId = `${row}${seat.number}`;
-  // const isLocked = lockedSeats?.includes(seatId);
-  // const isSelected = selectedSeats.includes(seatId);
+  const isLocked = lockedSeats?.includes(seatId);
+  const isSelected = selectedSeats?.includes(seatId);
 
   return (
     <button
       className={`w-9 h-9 m-[2px] rounded-lg border text-sm
         ${
-          // seat.status === "occupied"
-          //   ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-          //   : isLocked
-          //     ? "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
-          //     : isSelected
-          //       ? "bg-[#6e52fa] text-white border-[#cec4f7] border-3 cursor-pointer"
-          //       :
-          "hover:bg-gray-100 border-black cursor-pointer"
+          seat.status === "occupied"
+            ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+            : isLocked
+              ? "bg-gray-200 border-gray-300 text-gray-400 cursor-not-allowed"
+              : isSelected
+                ? "bg-[#6e52fa] text-white border-[#cec4f7] border-3 cursor-pointer"
+                : "hover:bg-gray-100 border-black cursor-pointer"
         }`}
-      disabled={seat.status === "occupied"}
-      // disabled={seat.status === "occupied" || isLocked}
-      // onClick={onClick}
+      disabled={seat.status === "occupied" || isLocked}
+      onClick={onClick}
     >
-      {seat.status === "occupied" ? "X" : seat.number}
-      {/* {seat.status === "occupied" || isLocked ? "X" : seat.number} */}
+      {seat.status === "occupied" || isLocked ? "X" : seat.number}
     </button>
   );
 };
 
 const SeatLayout = () => {
+  const { selectedSeats, setSelectedSeats, setSelectedShow } = useSeat();
+
+  const handleSelectSeat = (row: any, number: any) => {
+    const seatId = `${row}${number}`;
+    setSelectedSeats((prev: any[]) =>
+      prev.includes(seatId)
+        ? prev.filter((eid) => eid !== seatId)
+        : [...prev, seatId],
+    );
+  };
+
   const { showId } = useParams();
 
   const {
@@ -63,6 +72,10 @@ const SeatLayout = () => {
     placeholderData: keepPreviousData,
     select: (res) => res.data,
   });
+
+  useEffect(() => {
+    setSelectedShow(showData);
+  }, [showData]);
 
   return (
     <>
@@ -103,11 +116,11 @@ const SeatLayout = () => {
                                 key={i}
                                 seat={seat}
                                 row={rowObj.row}
-                                // selectedSeats={selectedSeats}
+                                selectedSeats={selectedSeats}
                                 // lockedSeats={lockedSeats}
-                                // onClick={() =>
-                                //   handleSelectSeat(rowObj.row, seat.number)
-                                // }
+                                onClick={() =>
+                                  handleSelectSeat(rowObj.row, seat.number)
+                                }
                               />
                             ))}
                           </div>

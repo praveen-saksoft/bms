@@ -12,11 +12,18 @@ import FullScreenLoader from "./components/shared/FullScreenLoader";
 import { Toaster } from "react-hot-toast";
 import { useLoadUser } from "./hooks/useLoadUser";
 import { useAuth } from "./context/AuthContext";
+import { SeatProvider } from "./context/SeatContext";
 
 const PrivateRoute = () => {
   const { isLoggedIn } = useAuth();
 
-  return isLoggedIn ? <Outlet /> : <Navigate to="/" replace />;
+  return isLoggedIn ? (
+    <SeatProvider>
+      <Outlet />
+    </SeatProvider>
+  ) : (
+    <Navigate to="/" replace />
+  );
 };
 
 function App() {

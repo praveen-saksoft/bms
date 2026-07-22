@@ -1,14 +1,30 @@
 import React from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSeat } from "@/context/SeatContext";
+import { useLiveLocation } from "@/context/LocationContext";
 
 const SeatFooter = () => {
-  const isSelected = true;
+  const { selectedSeats } = useSeat();
+  const { location } = useLiveLocation();
+
+  const navigate = useNavigate();
+  const { showId } = useParams();
+
+  const handleNavigateToCheckout = (e: React.MouseEvent<HTMLButtonElement>) => {
+    navigate(`/shows/${showId}/${location}/checkout`);
+  };
 
   return (
     <>
-      {isSelected ? (
+      {!!selectedSeats?.length ? (
         <div className="bg-white py-3 px-6 flex items-center justify-between z-10">
-          <p className="text-gray-700 font-medium text-base">2 Selected</p>
-          <button className="bg-black cursor-pointer text-white px-6 py-2 rounded-lg font-semibold">
+          <p className="text-gray-700 font-medium text-base">
+            {selectedSeats?.length} Selected
+          </p>
+          <button
+            onClick={handleNavigateToCheckout}
+            className="bg-black cursor-pointer text-white px-6 py-2 rounded-lg font-semibold"
+          >
             Proceed
           </button>
         </div>

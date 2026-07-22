@@ -38,7 +38,10 @@ export const groupSeatsByType = (seats: any[]) => {
     grouped[type].push(seatId);
   });
 
-  return Object.entries(grouped).map(([type, seats]) => ({ type, seats }));
+  return Object.entries<string[]>(grouped).map(([type, seats]) => ({
+    type,
+    seats,
+  }));
 };
 
 export const calculateTotalPrice = (seats: any[]) => {
