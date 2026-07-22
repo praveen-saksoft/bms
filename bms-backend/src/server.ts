@@ -1,6 +1,6 @@
 import http from "node:http";
 import app from "./app";
-import createSocketServer from "./socket";
+import createSocketServer from './socket';
 import { config } from "./config/config";
 import dbConnect from "./config/db";
 import "./config/redis";

@@ -2,9 +2,13 @@ import React, { useEffect, useEffectEvent, useState } from "react";
 
 interface IUseCountDownProps {
   initialTimeInSeconds: number;
+  expiryCondition?: number;
 }
 
-export const useCountDown = ({ initialTimeInSeconds }: IUseCountDownProps) => {
+export const useCountDown = ({
+  initialTimeInSeconds,
+  expiryCondition = 0,
+}: IUseCountDownProps) => {
   const [timeInSeconds, setTimeInSeconds] = useState(initialTimeInSeconds);
 
   const onTick = useEffectEvent(() => {
@@ -27,6 +31,6 @@ export const useCountDown = ({ initialTimeInSeconds }: IUseCountDownProps) => {
 
   return {
     displayTime: `${displayMinutes}:${displaySeconds}`,
-    isExpired: timeInSeconds <= 0,
+    isExpired: timeInSeconds <= expiryCondition,
   };
 };

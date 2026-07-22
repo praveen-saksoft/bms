@@ -1,8 +1,9 @@
-import React, { useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import dayjs from "dayjs";
 import { FaInfoCircle } from "react-icons/fa";
 import { BiSolidOffer } from "react-icons/bi";
 import { CiCircleQuestion, CiUser } from "react-icons/ci";
+import toast from "react-hot-toast";
 
 import { calculateTotalPrice, groupSeatsByType } from "@/utils";
 import { useAuth } from "@/context/AuthContext";
@@ -11,9 +12,10 @@ import { useLiveLocation } from "@/context/LocationContext";
 
 import SeatHeader from "@/components/seat-layout/SeatHeader";
 import { useNavigate } from "react-router-dom";
+import { useCountDown } from "@/hooks/useCountDown";
 
 const Checkout = () => {
-  const { user, toggleModal } = useAuth();
+  const { user, toggleModal, socket } = useAuth();
 
   if (!user.email || !user.mobile) {
     toggleModal();
@@ -22,6 +24,10 @@ const Checkout = () => {
 
   const { location } = useLiveLocation();
   const { selectedSeats, selectedShow } = useSeat();
+  const { displayTime, isExpired } = useCountDown({
+    initialTimeInSeconds: 5 * 60,
+    expiryCondition: 1,
+  });
 
   const navigate = useNavigate();
 
@@ -30,6 +36,18 @@ const Checkout = () => {
       navigate(-1);
     }
   }, []);
+
+  useEffect(() => {
+    if (isExpired) {
+      socket?.emit("unlock-seats", {
+        showId: selectedShow?._id,
+        userId: user?._id,
+      });
+
+      toast.error("Time expired");
+      navigate(-1);
+    }
+  }, [isExpired]);
 
   const { base, tax, total } = calculateTotalPrice(selectedSeats);
 
@@ -59,6 +77,11 @@ const Checkout = () => {
                 <p className="text-sm text-gray-600">
                   {selectedShow?.theater?.name}, {selectedShow?.theater?.city},{" "}
                   {selectedShow?.theater?.state}
+                </p>
+              </div>
+              <div className="ml-auto mt-1">
+                <p className="text-sm text-[#f74656] font-bold flex items-center justify-center border border-dashed rounded-md py-2 min-w-[150px]">
+                  Time Left: {displayTime}
                 </p>
               </div>
             </div>

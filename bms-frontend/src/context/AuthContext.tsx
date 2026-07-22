@@ -2,11 +2,13 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { io, Socket } from "socket.io-client";
 
 import { activateUser, logout, sendOtp, verifyOtp } from "@/apis";
 
@@ -27,6 +29,7 @@ interface IAuthContext {
   activateUserLoading: boolean;
   logoutRequest: () => Promise<void>;
   logoutLoading: boolean;
+  socket: Socket | null;
 }
 
 interface IAuthProviderProps {
@@ -143,6 +146,24 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     });
   };
 
+  /** Socket Connection */
+  const [socket, setSocket] = useState<Socket | null>(null);
+  useEffect(() => {
+    const newSocket = io(import.meta.env.VITE_SOCKET_URL, {
+      withCredentials: true,
+    });
+    newSocket.on("connect", () => {
+      console.log("[Socket Client] connected to server:", newSocket.id);
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.off("connect");
+      newSocket.disconnect();
+    };
+  }, []);
+
   const providerValue: IAuthContext = useMemo(
     () => ({
       step,
@@ -161,6 +182,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
       activateUserLoading: activateUserMutation.isPending,
       logoutRequest,
       logoutLoading: logoutMutation.isPending,
+      socket,
     }),
     [
       step,
@@ -171,6 +193,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
       verifyOtpMutation.isPending,
       activateUserMutation.isPending,
       logoutMutation.isPending,
+      socket,
     ],
   );
 

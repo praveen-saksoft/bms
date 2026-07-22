@@ -1,14 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { getShowById } from "@/apis";
 import screenImg from "@/assets/screen.png";
 import { useSeat } from "@/context/SeatContext";
-import { socket } from "@/utils/socket";
+import { useAuth } from "@/context/AuthContext";
 
 import SeatHeader from "@/components/seat-layout/SeatHeader";
 import SeatFooter from "@/components/seat-layout/SeatFooter";
+import toast from "react-hot-toast";
 
 interface ISeatProps {
   seat: { status: string; number: string };
@@ -50,7 +51,9 @@ const Seat: React.FC<ISeatProps> = ({
 };
 
 const SeatLayout = () => {
+  const [lockedSeats, setLockedSeats] = useState<any[]>([]);
   const { selectedSeats, setSelectedSeats, setSelectedShow } = useSeat();
+  const { socket } = useAuth();
 
   const handleSelectSeat = (row: any, number: any) => {
     const seatId = `${row}${number}`;
@@ -76,15 +79,40 @@ const SeatLayout = () => {
 
   useEffect(() => {
     setSelectedShow(showData);
-    socket.connect();
-    socket.on("connect", () => {
-      console.log("🟢 Client connected to server! ID:", socket.id);
-    });
-    return () => {
-      socket.off("connect");
-      socket.disconnect();
-    };
   }, [showData]);
+
+  useEffect(() => {
+    setSelectedSeats([]);
+
+    socket?.emit("join-show", { showId });
+    //
+    socket?.on("locked-seats-initials", ({ seatIds }) => {
+      setLockedSeats(seatIds);
+    });
+    //
+    socket?.on("seat-locked", ({ seatIds, showId: incomingShowId }) => {
+      if (incomingShowId !== showId) return;
+      setLockedSeats((prev) => [...new Set([...prev, ...seatIds])]);
+    });
+    //
+    socket?.on("seat-unlocked", ({ seatIds, showId: incomingShowId }) => {
+      if (incomingShowId !== showId) return;
+      setLockedSeats((prev) => prev.filter((id) => !seatIds?.includes(id)));
+    });
+    //
+    socket?.on("seat-locked-failed", ({ showId, requested, alreadyLocked }) => {
+      toast.error(
+        `Some seats are already locked: ${alreadyLocked?.join(", ")}`,
+      );
+    });
+
+    return () => {
+      socket?.off("locked-seats-initials");
+      socket?.off("seat-locked");
+      socket?.off("seat-unlocked");
+      socket?.off("seat-locked-failed");
+    };
+  }, [showId]);
 
   return (
     <>
@@ -126,7 +154,7 @@ const SeatLayout = () => {
                                 seat={seat}
                                 row={rowObj.row}
                                 selectedSeats={selectedSeats}
-                                // lockedSeats={lockedSeats}
+                                lockedSeats={lockedSeats}
                                 onClick={() =>
                                   handleSelectSeat(rowObj.row, seat.number)
                                 }

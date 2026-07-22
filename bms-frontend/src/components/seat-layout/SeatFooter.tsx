@@ -1,16 +1,24 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
 import { useSeat } from "@/context/SeatContext";
 import { useLiveLocation } from "@/context/LocationContext";
+import { useAuth } from "@/context/AuthContext";
 
 const SeatFooter = () => {
   const { selectedSeats } = useSeat();
   const { location } = useLiveLocation();
+  const { user, socket } = useAuth();
 
   const navigate = useNavigate();
   const { showId } = useParams();
 
   const handleNavigateToCheckout = (e: React.MouseEvent<HTMLButtonElement>) => {
+    socket?.emit("lock-seats", {
+      showId,
+      seatIds: selectedSeats,
+      userId: user._id,
+    });
     navigate(`/shows/${showId}/${location}/checkout`);
   };
 
