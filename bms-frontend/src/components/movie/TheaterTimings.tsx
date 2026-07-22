@@ -5,6 +5,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { useLiveLocation } from "@/context/LocationContext";
 import { getShowsByMovieAndLocation } from "@/apis";
+import { useAuth } from "@/context/AuthContext";
 
 interface ITheaterTimingsProps {
   movieId: string;
@@ -13,6 +14,7 @@ interface ITheaterTimingsProps {
 const TheaterTimings: React.FC<ITheaterTimingsProps> = ({ movieId }) => {
   const navigate = useNavigate();
   const { location } = useLiveLocation();
+  const { isLoggedIn, toggleModal } = useAuth();
 
   const today = dayjs();
   const [selectedDate, setSelectedDate] = useState(today);
@@ -38,6 +40,11 @@ const TheaterTimings: React.FC<ITheaterTimingsProps> = ({ movieId }) => {
   };
 
   const handleNavigate = (movie: any, theater: any, show: any) => {
+    if (!isLoggedIn) {
+      toggleModal();
+      return;
+    }
+
     const movieName = sanitizeTitle(movie?.title);
 
     navigate(

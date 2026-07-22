@@ -5,6 +5,8 @@ import * as UserService from "../user/user.service";
 import createHttpError from "http-errors";
 import { isValidEmail } from "../../utils";
 import { IUser } from "../user/user.interface";
+import { ITokenPayload } from "./auth.interface";
+import { JwtPayload } from "jsonwebtoken";
 
 export const sentOtp = async (
   req: Request,
@@ -150,4 +152,66 @@ export const logout = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { refreshToken: refTokenFromCookies } = req.cookies;
+
+  if (!refTokenFromCookies) {
+    next(createHttpError(401, "Refresh token not found, please login again"));
+    return;
+  }
+
+  let decodedToken: ITokenPayload | JwtPayload | string;
+  try {
+    decodedToken = TokenService.verifyRefreshToken(refTokenFromCookies);
+  } catch (error) {
+    next(createHttpError(401, "Invalid refresh token, please login again"));
+    return;
+  }
+
+  try {
+    const token = await TokenService.findRefreshToken(
+      decodedToken?._id,
+      refTokenFromCookies,
+    );
+    if (!token) {
+      next(createHttpError(401, "Invalid refresh token, please login again"));
+      return;
+    }
+  } catch (error) {
+    next(error);
+    return;
+  }
+
+  const { accessToken, refreshToken } = TokenService.generateToken({
+    _id: decodedToken._id,
+    email: decodedToken.email,
+  });
+
+  try {
+    await TokenService.updateRefreshToken(decodedToken._id, refreshToken);
+  } catch (error) {
+    next(error);
+    return;
+  }
+
+  res.cookie("accessToken", accessToken, {
+    maxAge: 1000 * 60 * 60, //1 hour
+    httpOnly: true,
+    sameSite: "lax",
+    secure: true,
+  });
+  res.cookie("refreshToken", refreshToken, {
+    maxAge: 1000 * 60 * 60 * 24, //24 hours
+    httpOnly: true,
+    sameSite: "lax",
+    secure: true,
+  });
+
+  res.status(200).json({ message: "Success" });
 };

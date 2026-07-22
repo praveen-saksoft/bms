@@ -31,3 +31,32 @@ export const logout = () => axiosWrapper.post(`/auth/logout`);
 export const activateUser = ({ id, ...data }: any) =>
   axiosWrapper.patch(`/users/activate/${id}`, data);
 export const getUser = () => axiosWrapper.get(`/users/me`);
+
+axiosWrapper.interceptors.response.use(
+  (config) => config,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      !originalRequest.url.endsWith("refresh-token") &&
+      +error.response.status === 401 &&
+      originalRequest &&
+      !originalRequest._isRetry
+    ) {
+      originalRequest._isRetry = true;
+      try {
+        await axiosWrapper.post(
+          `/auth/refresh-token`,
+          {},
+          { withCredentials: true },
+        );
+
+        return axiosWrapper.request(originalRequest);
+      } catch (error) {
+        console.log("Error while refreshing the token", error);
+      }
+    }
+
+    throw error;
+  },
+);
