@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import router from "./routes/index";
 import { globalErrorHandler } from "./middlewares/error.middleware";
+import { config } from "./config/config";
 
 dotenv.config();
 
@@ -12,7 +13,7 @@ const app = express();
 app.use(
   cors({
     credentials: true,
-    origin: ["http://localhost:3000"],
+    origin: config.frontEndUrl,
   }),
 );
 app.use(cookieParser());

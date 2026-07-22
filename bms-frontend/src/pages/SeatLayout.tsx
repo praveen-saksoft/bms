@@ -5,6 +5,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { getShowById } from "@/apis";
 import screenImg from "@/assets/screen.png";
 import { useSeat } from "@/context/SeatContext";
+import { socket } from "@/utils/socket";
 
 import SeatHeader from "@/components/seat-layout/SeatHeader";
 import SeatFooter from "@/components/seat-layout/SeatFooter";
@@ -75,6 +76,14 @@ const SeatLayout = () => {
 
   useEffect(() => {
     setSelectedShow(showData);
+    socket.connect();
+    socket.on("connect", () => {
+      console.log("🟢 Client connected to server! ID:", socket.id);
+    });
+    return () => {
+      socket.off("connect");
+      socket.disconnect();
+    };
   }, [showData]);
 
   return (

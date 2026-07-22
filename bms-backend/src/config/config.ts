@@ -11,6 +11,9 @@ const _config = {
   emailClientId: process.env.NODEMAILER_EMAIL_CLIENT_ID as string,
   emailClientSecret: process.env.NODEMAILER_EMAIL_CLIENT_SECRET as string,
   emailClientRefreshToken: process.env.NODEMAILER_EMAIL_REFRESH_TOKEN as string,
+  redisHost: process.env.REDIS_HOST as string,
+  redisPort: (process.env.REDIS_PORT || "6379") as string,
+  frontEndUrl: (process.env.FRONTEND_URL) as string,
 };
 
 export const config = Object.freeze(_config);
