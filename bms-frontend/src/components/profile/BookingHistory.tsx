@@ -9,11 +9,8 @@ const BookingHistory = () => {
         <h3 className="text-xl font-semibold mb-4">Your Orders</h3>
 
         {ordersData.map((order, i) => (
-          <>
-            <div
-              key={order.id}
-              className="bg-white p-5 rounded-md mb-2 overflow-hidden"
-            >
+          <React.Fragment key={order.id + "" + i}>
+            <div className="bg-white p-5 rounded-md mb-2 overflow-hidden">
               <div className="flex items-start gap-10">
                 <img
                   src={order.poster}
@@ -63,7 +60,7 @@ const BookingHistory = () => {
                 <p>{order.id}</p>
               </div>
             </div>
-          </>
+          </React.Fragment>
         ))}
       </div>
     </>

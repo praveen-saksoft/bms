@@ -23,7 +23,7 @@ export const registerSocketHandlers = (socket: Socket, io: Server) => {
     const lockedSeats = await redis.smembers(`locked-seats:${showId}`);
 
     const activeLockedSeats: any[] = [];
-    for (const seatId of activeLockedSeats) {
+    for (const seatId of lockedSeats) {
       const lockKey = `seat-lock:${showId}:${seatId}`;
       const exists = await redis.exists(lockKey);
       if (exists) {
@@ -34,7 +34,7 @@ export const registerSocketHandlers = (socket: Socket, io: Server) => {
     }
 
     // send locked seats to all users present in this room
-    socket.emit("locked-seats-initials", { seatIds: lockedSeats });
+    socket.emit("locked-seats-initials", { seatIds: activeLockedSeats });
   });
 
   /**

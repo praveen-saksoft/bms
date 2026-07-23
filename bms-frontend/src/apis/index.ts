@@ -31,6 +31,11 @@ export const logout = () => axiosWrapper.post(`/auth/logout`);
 export const activateUser = ({ id, ...data }: any) =>
   axiosWrapper.patch(`/users/activate/${id}`, data);
 export const getUser = () => axiosWrapper.get(`/users/me`);
+// Payment apis
+export const createOrderRazorpay = (data: any) =>
+  axiosWrapper.post("/payment/create-order", data);
+export const verifyPaymentRazorpay = (data: any) =>
+  axiosWrapper.post("/payment/verify-payment", data);
 
 axiosWrapper.interceptors.response.use(
   (config) => config,

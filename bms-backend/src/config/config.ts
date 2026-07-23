@@ -13,7 +13,9 @@ const _config = {
   emailClientRefreshToken: process.env.NODEMAILER_EMAIL_REFRESH_TOKEN as string,
   redisHost: process.env.REDIS_HOST as string,
   redisPort: (process.env.REDIS_PORT || "6379") as string,
-  frontEndUrl: (process.env.FRONTEND_URL) as string,
+  frontEndUrl: process.env.FRONTEND_URL as string,
+  razorpayKey: process.env.RAZORPAY_API_KEY as string,
+  razorpaySecret: process.env.RAZORPAY_API_SECRET as string,
 };
 
 export const config = Object.freeze(_config);

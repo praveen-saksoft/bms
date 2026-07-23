@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import dayjs from "dayjs";
 import { FaInfoCircle } from "react-icons/fa";
 import { BiSolidOffer } from "react-icons/bi";
@@ -11,8 +11,27 @@ import { useSeat } from "@/context/SeatContext";
 import { useLiveLocation } from "@/context/LocationContext";
 
 import SeatHeader from "@/components/seat-layout/SeatHeader";
+import FullScreenLoader from "@/components/shared/FullScreenLoader";
 import { useNavigate } from "react-router-dom";
 import { useCountDown } from "@/hooks/useCountDown";
+import { razorPayScript } from "@/utils/constants";
+import { useMutation } from "@tanstack/react-query";
+import { createOrderRazorpay, verifyPaymentRazorpay } from "@/apis";
+
+function loadScript() {
+  return new Promise<boolean>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = razorPayScript;
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = (error) => {
+      reject(error);
+    };
+
+    document.body.appendChild(script);
+  });
+}
 
 const Checkout = () => {
   const { user, toggleModal, socket } = useAuth();
@@ -22,6 +41,8 @@ const Checkout = () => {
     return;
   }
 
+  const [loaderMessage, setLoaderMessage] = useState("");
+
   const { location } = useLiveLocation();
   const { selectedSeats, selectedShow } = useSeat();
   const { displayTime, isExpired } = useCountDown({
@@ -30,18 +51,20 @@ const Checkout = () => {
   });
 
   const navigate = useNavigate();
-
   useLayoutEffect(() => {
     if (!selectedShow || !selectedSeats.length) {
       navigate(-1);
     }
   }, []);
+  //
+  const { base, tax, total } = calculateTotalPrice(selectedSeats);
 
   useEffect(() => {
     if (isExpired) {
       socket?.emit("unlock-seats", {
         showId: selectedShow?._id,
         userId: user?._id,
+        seatIds: selectedSeats,
       });
 
       toast.error("Time expired");
@@ -49,10 +72,72 @@ const Checkout = () => {
     }
   }, [isExpired]);
 
-  const { base, tax, total } = calculateTotalPrice(selectedSeats);
+  /** Payment Gateway Integration Start */
+  const verifyPaymentMutation = useMutation({
+    mutationFn: (reqData: any) => verifyPaymentRazorpay(reqData),
+    onSuccess: (res) => {
+      toast.success(res?.data?.message);
+      navigate(`/profile/${user?._id}`);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
+
+  const createOrderMutation = useMutation({
+    mutationFn: (reqData: any) => createOrderRazorpay(reqData),
+    onSuccess: (res) => {
+      const orderData = res?.data;
+
+      const options = {
+        name: "BookMyScreen",
+        description: "Secure Payment for Your Booking",
+        key: import.meta.env.VITE_RAZORPAY_API_KEY,
+        amount: orderData?.amount,
+        currency: orderData?.currency,
+        order_id: orderData?.id,
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: user?.mobile,
+        },
+        theme: { color: "#025cca" },
+        handler: async function (res: any) {
+          verifyPaymentMutation.mutate(res);
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+  const handleBookSeat = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setLoaderMessage("Redirection to payment gateway, Hang on!!");
+    try {
+      const res = await loadScript();
+
+      if (res) {
+        const reqData = {
+          amount: total,
+        };
+        createOrderMutation.mutate(reqData);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error((error as Error).message);
+    } finally {
+      setLoaderMessage("");
+    }
+  };
+  /** Payment Gateway Integration End */
 
   return (
     <div className="min-h-screen w-full bg-white">
+      {!!loaderMessage && <FullScreenLoader message={loaderMessage} />}
       <SeatHeader type="checkout" />
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="flex flex-col lg:flex-row gap-6">
@@ -172,7 +257,10 @@ const Checkout = () => {
               </p>
             </div>
 
-            <div className="flex justify-between items-center bg-black rounded-[24px] px-6 py-4 cursor-pointer hover:shadow-2xl hover:shadow-red-300 hover:scale-x-105 transition ease-in-out">
+            <div
+              onClick={handleBookSeat}
+              className="flex justify-between items-center bg-black rounded-[24px] px-6 py-4 cursor-pointer hover:shadow-2xl hover:shadow-red-300 hover:scale-x-105 transition ease-in-out"
+            >
               <p className="text-white font-bold">
                 ₹{total} <span className="text-xs font-medium">TOTAL</span>
               </p>
