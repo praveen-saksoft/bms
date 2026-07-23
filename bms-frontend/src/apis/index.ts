@@ -36,6 +36,9 @@ export const createOrderRazorpay = (data: any) =>
   axiosWrapper.post("/payment/create-order", data);
 export const verifyPaymentRazorpay = (data: any) =>
   axiosWrapper.post("/payment/verify-payment", data);
+// Booking
+export const bookShow = (data: any) => axiosWrapper.post("/bookings", data);
+export const getBookings = () => axiosWrapper.get("/bookings");
 
 axiosWrapper.interceptors.response.use(
   (config) => config,

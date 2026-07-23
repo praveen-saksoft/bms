@@ -361,7 +361,10 @@ export const filters = [
   "Dolby Atmos",
 ];
 
-export const tabs = ["Profile", "Your Orders"];
+export const tabs = [
+  { label: "Profile", value: "profile" },
+  { label: "Your Orders", value: "booking" },
+];
 
 export const countryCodes = [
   { name: "India", code: "IN", dial_code: "+91" },

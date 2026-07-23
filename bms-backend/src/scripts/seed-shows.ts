@@ -92,14 +92,14 @@ export const seedShow = async () => {
     }
   }
 
-  console.log("✅ Show seeding completed for selected movies in West Bengal.");
+  console.log("✅ Show seeding completed for selected movies in Maharashtra.");
 };
 
 mongoose
   .connect(config.dbUrl, { dbName: "bms" })
   .then(async () => {
     console.log("DB connected");
-    await ShowModel.deleteMany({});
+    await ShowModel.deleteMany();
     console.log("🧹 Existing shows deleted.");
     await seedShow();
     mongoose.disconnect();

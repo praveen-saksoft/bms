@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { useCountDown } from "@/hooks/useCountDown";
 import { razorPayScript } from "@/utils/constants";
 import { useMutation } from "@tanstack/react-query";
-import { createOrderRazorpay, verifyPaymentRazorpay } from "@/apis";
+import { bookShow, createOrderRazorpay, verifyPaymentRazorpay } from "@/apis";
 
 function loadScript() {
   return new Promise<boolean>((resolve, reject) => {
@@ -59,13 +59,17 @@ const Checkout = () => {
   //
   const { base, tax, total } = calculateTotalPrice(selectedSeats);
 
+  const unlockSeats = () => {
+    socket?.emit("unlock-seats", {
+      showId: selectedShow?._id,
+      userId: user?._id,
+      seatIds: selectedSeats,
+    });
+  };
+
   useEffect(() => {
     if (isExpired) {
-      socket?.emit("unlock-seats", {
-        showId: selectedShow?._id,
-        userId: user?._id,
-        seatIds: selectedSeats,
-      });
+      unlockSeats();
 
       toast.error("Time expired");
       navigate(-1);
@@ -73,11 +77,35 @@ const Checkout = () => {
   }, [isExpired]);
 
   /** Payment Gateway Integration Start */
+  const bookTicketMutation = useMutation({
+    mutationFn: (reqData: any) => bookShow(reqData),
+    onSuccess: (res) => {
+      console.log(res.data);
+      toast.success("Booking successful");
+      unlockSeats();
+      navigate(`/profile/${user?._id}/booking`);
+    },
+    onError: (error) => {
+      toast.error((error as Error).message);
+    },
+  });
+
   const verifyPaymentMutation = useMutation({
     mutationFn: (reqData: any) => verifyPaymentRazorpay(reqData),
-    onSuccess: (res) => {
+    onSuccess: (res, { razorpay_payment_id }) => {
       toast.success(res?.data?.message);
-      navigate(`/profile/${user?._id}`);
+
+      const bookingData = {
+        showId: selectedShow?._id,
+        seats: selectedSeats,
+        paymentId: razorpay_payment_id,
+        bookingFee: {
+          ticketPrice: base,
+          convenience: tax,
+          total,
+        },
+      };
+      bookTicketMutation.mutate(bookingData);
     },
     onError: (err) => {
       console.log(err);
@@ -114,6 +142,7 @@ const Checkout = () => {
       console.log(error);
     },
   });
+
   const handleBookSeat = async (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     setLoaderMessage("Redirection to payment gateway, Hang on!!");

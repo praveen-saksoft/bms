@@ -54,7 +54,7 @@ function App() {
               element={<MovieDetails />}
             />
             <Route element={<PrivateRoute />}>
-              <Route path="/profile/:id" element={<Profile />} />
+              <Route path="/profile/:id/:tab?" element={<Profile />} />
               <Route
                 path="/movies/:id/:movieName/:state/theater/:theaterId/show/:showId/seat-layout"
                 element={<SeatLayout />}

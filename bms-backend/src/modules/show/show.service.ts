@@ -1,7 +1,8 @@
-import { Types } from "mongoose";
+import { ClientSession, Types } from "mongoose";
 import { generateSeatLayout } from "../../utils";
 import type { IShow, TSeatStatus } from "./show.interface";
 import { ShowModel } from "./show.model";
+import createHttpError from "http-errors";
 
 // create show service
 export const createShowService = async (showData: IShow) => {
@@ -90,14 +91,47 @@ export const getShowByIdService = async (showId: string) => {
 };
 // update seat status
 export const updateSeatStatusService = async (
-  showId: string,
-  row: string,
-  seatNumber: number,
+  showId: Types.ObjectId,
+  seats: string[],
   status: TSeatStatus,
+  session: ClientSession,
 ) => {
-  return await ShowModel.updateOne(
-    { _id: new Types.ObjectId(showId), "seatLayout.row": row },
-    { $set: { "seatLayout.$.seats.$[seat].status": status } },
-    { arrayFilters: [{ "seat.number": seatNumber }] },
-  );
+  const show = await ShowModel.findById(showId).session(session);
+
+  if (!show) {
+    throw createHttpError(404, "Show not found");
+  }
+
+  // parse each seat string like "A1" into row and number
+  const parsedSeats = seats.map((seat) => {
+    const row = seat.charAt(0);
+    const number = parseInt(seat.slice(1));
+    return { row, number, label: seat };
+  });
+
+  const seatLayout = show.seatLayout;
+
+  for (const pSeat of parsedSeats) {
+    // search the seatlayout array fow a row whose "row" field matches e.g. "A"
+    // seatlayout = [{row: "A", seats: [..]},...]
+    const row = seatLayout.find((r) => r.row === pSeat.row);
+
+    if (!row) {
+      throw createHttpError(400, `Invalid seat: ${pSeat.label}`);
+    }
+
+    const seat = row.seats.find((s) => s.number === pSeat.number);
+    if (!seat) {
+      throw createHttpError(400, `Invalid seat: ${pSeat.label}`);
+    }
+
+    if (status === "BOOKED" && seat.status === "BOOKED") {
+      throw createHttpError(400, `Seat ${pSeat.label} is already booked!`);
+    }
+
+    seat.status = status;
+  }
+
+  show.markModified("seatLayout");
+  await show.save({ session });
 };

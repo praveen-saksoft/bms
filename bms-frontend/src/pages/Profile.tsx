@@ -1,13 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosLogOut, IoMdAdd } from "react-icons/io";
 import { FiEdit } from "react-icons/fi";
 
 import { tabs } from "@/utils/constants";
 import { useAuth } from "@/context/AuthContext";
 import BookingHistory from "@/components/profile/BookingHistory";
+import { useParams } from "react-router-dom";
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState("Profile");
+  const { tab } = useParams();
+
+  useEffect(() => {
+    if (tab && tabs.find((t) => t.value === tab)) {
+      setActiveTab(tab);
+    }
+  }, [tab]);
+
+  const [activeTab, setActiveTab] = useState("profile");
 
   const { user, logoutRequest, logoutLoading } = useAuth();
 
@@ -22,11 +31,11 @@ const Profile = () => {
         <div className="max-w-7xl mx-auto flex flex-wrap gap-6 py-2 text-sm font-medium">
           {tabs.map((tab, i) => (
             <button
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setActiveTab(tab.value)}
               key={i}
-              className={`pb-1 cursor-pointer ${activeTab === tab ? "text-[#f74565]" : "text-gray-500"} hover:text-black`}
+              className={`pb-1 cursor-pointer ${activeTab === tab.value ? "text-[#f74565]" : "text-gray-500"} hover:text-black`}
             >
-              {tab}
+              {tab.label}
             </button>
           ))}
         </div>
@@ -34,7 +43,7 @@ const Profile = () => {
       <div className="min-h-screen py-10 px-4 bg-gray-100">
         <div className="max-w-6xl mx-auto">
           {/* Profile Section */}
-          {activeTab === "Profile" && (
+          {activeTab === "profile" && (
             <>
               {/* Headers */}
               <div className="bg-linear-to-r from-gray-800 to-[#f74565] rounded-t-md px-6 py-6 flex items-center gap-6 text-white">
@@ -136,7 +145,7 @@ const Profile = () => {
             </>
           )}
           {/* Bookings Section */}
-          {activeTab === "Your Orders" && <BookingHistory />}
+          {activeTab === "booking" && <BookingHistory />}
         </div>
       </div>
     </>

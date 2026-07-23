@@ -45,23 +45,3 @@ export const getShowById = async (
     next(error);
   }
 };
-
-export const updateSeatStatus = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const { showId } = req.params;
-    const { row, seatNumber, status } = req.query;
-    const updatedShow = await ShowService.updateSeatStatusService(
-      showId as string,
-      row as string,
-      Number(seatNumber),
-      status as TSeatStatus,
-    );
-    res.status(200).json(updatedShow);
-  } catch (error) {
-    next(error);
-  }
-};
